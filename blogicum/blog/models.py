@@ -41,7 +41,10 @@ class Category(BaseModel):
         return self.title
 
     def get_absolute_url(self) -> str:
-        return reverse("blog:category_posts", kwargs={"category_slug": self.slug})
+        return reverse(
+            "blog:category_posts",
+            kwargs={"category_slug": self.slug},
+        )
 
 
 class Location(BaseModel):
