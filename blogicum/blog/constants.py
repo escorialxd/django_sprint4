@@ -1,1 +1,0 @@
-PAGINATOR = 10
