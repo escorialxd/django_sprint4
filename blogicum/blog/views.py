@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.db.models import Count
@@ -56,9 +57,21 @@ class PostCreateView(PostsMixin, LoginRequiredMixin, CreateView):
         )
 
 
-class PostDetailView(PostsQuerySetMixin, DetailView):
+class PostDetailView(DetailView):
     model = Post
     template_name = "blog/detail.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if (
+            not self.object.is_published
+            and self.object.author != self.request.user
+        ):
+            raise Http404
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
