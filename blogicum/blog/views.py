@@ -164,6 +164,8 @@ class IndexListView(PostsQuerySetMixin, ListView):
         return (
             super()
             .get_queryset()
+            .published()
+            .filter_by_pub_date()
             .with_related()
             .with_comment_count()
             .order_by_date()
@@ -187,7 +189,10 @@ class CategoryListView(PostsQuerySetMixin, ListView):
         return (
             super()
             .get_queryset()
+            .published()
+            .filter_by_pub_date()
             .for_category(self.kwargs["category_slug"])
-            .with_related().with_comment_count()
+            .with_related()
+            .with_comment_count()
             .order_by_date()
         )
