@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
+from typing import Type
 
-from .managers import PostManager
+from .querysets import PostQuerySet
 
 User = get_user_model()
+
+MAX_LENGTH = 256
 
 
 class BaseModel(models.Model):
@@ -22,7 +25,9 @@ class BaseModel(models.Model):
 
 
 class Category(BaseModel):
-    title = models.CharField(max_length=256, verbose_name="Заголовок")
+    title = models.CharField(max_length=MAX_LENGTH,
+                             verbose_name="Заголовок"
+                             )
     description = models.TextField(verbose_name="Описание")
     slug = models.SlugField(
         verbose_name="Идентификатор",
@@ -48,7 +53,9 @@ class Category(BaseModel):
 
 
 class Location(BaseModel):
-    name = models.CharField(max_length=256, verbose_name="Название места")
+    name = models.CharField(max_length=MAX_LENGTH,
+                            verbose_name="Название места"
+                            )
 
     class Meta:
         verbose_name = "местоположение"
@@ -59,7 +66,9 @@ class Location(BaseModel):
 
 
 class Post(BaseModel):
-    title = models.CharField(max_length=256, verbose_name="Заголовок")
+    title = models.CharField(max_length=MAX_LENGTH,
+                             verbose_name="Заголовок"
+                             )
     text = models.TextField(verbose_name="Текст")
     pub_date = models.DateTimeField(
         auto_now=False,
@@ -80,6 +89,7 @@ class Post(BaseModel):
         verbose_name="Местоположение",
         on_delete=models.SET_NULL,
         null=True,
+        blank=True
     )
     category = models.ForeignKey(
         Category,
@@ -88,8 +98,8 @@ class Post(BaseModel):
         null=True,
     )
     image = models.ImageField("Изображение", blank=True, upload_to="img/")
-    objects = models.Manager()
-    post_list = PostManager()
+
+    objects: Type[PostQuerySet] = PostQuerySet.as_manager()
 
     class Meta:
         verbose_name = "публикация"

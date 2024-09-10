@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.db.models import Count
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -136,32 +135,22 @@ class ProfileListView(PostsQuerySetMixin, ListView):
     paginate_by = PAGINATOR
 
     def get_queryset(self):
-        if self.request.user.username == self.kwargs["username"]:
-            return (
-                self.request.user.posts.select_related(
-                    "category",
-                    "author",
-                    "location",
-                )
-                .all()
-                .annotate(comment_count=Count("comments"))
-                .order_by("-pub_date")
-            )
-
-        return (
+        queryset = (
             super()
             .get_queryset()
-            .filter(author__username=self.kwargs["username"])
-            .annotate(comment_count=Count("comments"))
-            .order_by("-pub_date")
+            .with_related()
+            .with_comment_count()
+            .order_by_date()
         )
+        if self.request.user.username == self.kwargs["username"]:
+            return queryset.filter(author=self.request.user)
+        return queryset.for_author(self.kwargs["username"])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["profile"] = get_object_or_404(
-            User,
-            username=self.kwargs["username"],
-        )
+        context["profile"] = get_object_or_404(User,
+                                               username=self.kwargs["username"]
+                                               )
         return context
 
 
@@ -172,7 +161,13 @@ class IndexListView(PostsQuerySetMixin, ListView):
     paginate_by = PAGINATOR
 
     def get_queryset(self):
-        return super().get_queryset().annotate(comment_count=Count("comments"))
+        return (
+            super()
+            .get_queryset()
+            .with_related()
+            .with_comment_count()
+            .order_by_date()
+        )
 
 
 class CategoryListView(PostsQuerySetMixin, ListView):
@@ -192,6 +187,7 @@ class CategoryListView(PostsQuerySetMixin, ListView):
         return (
             super()
             .get_queryset()
-            .filter(category__slug=self.kwargs["category_slug"])
-            .annotate(comment_count=Count("comments"))
+            .for_category(self.kwargs["category_slug"])
+            .with_related().with_comment_count()
+            .order_by_date()
         )

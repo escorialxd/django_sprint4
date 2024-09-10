@@ -3,7 +3,7 @@ from .models import Comment, Post
 
 class PostsQuerySetMixin:
     def get_queryset(self):
-        return Post.post_list
+        return Post.objects.all().order_by('-pub_date')
 
 
 class PostsMixin:
