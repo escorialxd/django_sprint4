@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from .models import Comment, Post
@@ -24,11 +24,11 @@ class CommentMixin:
 
 
 class OwnerRequiredMixin:
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if self.request.user != obj.author:
-            raise Http404
-        return obj
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.request.user != self.object.author:
+            return redirect('blog:post_detail', pk=self.object.pk)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class CommentDeleteUpdateMixin:
