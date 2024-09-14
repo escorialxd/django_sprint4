@@ -4,13 +4,13 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
-from .forms import CustomUserCreationForm, EditUserForm
+from .forms import UserCreationForm, EditUserForm
 
 User = get_user_model()
 
 
 class UserCreateView(CreateView):
-    form_class = CustomUserCreationForm
+    form_class = UserCreationForm
     template_name = "registration/registration_form.html"
     success_url = reverse_lazy("authorization:login")
 

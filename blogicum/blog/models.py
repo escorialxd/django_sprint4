@@ -25,9 +25,10 @@ class BaseModel(models.Model):
 
 
 class Category(BaseModel):
-    title = models.CharField(max_length=MAX_LENGTH,
-                             verbose_name="Заголовок"
-                             )
+    title = models.CharField(
+        max_length=MAX_LENGTH,
+        verbose_name="Заголовок"
+    )
     description = models.TextField(verbose_name="Описание")
     slug = models.SlugField(
         verbose_name="Идентификатор",
@@ -53,9 +54,10 @@ class Category(BaseModel):
 
 
 class Location(BaseModel):
-    name = models.CharField(max_length=MAX_LENGTH,
-                            verbose_name="Название места"
-                            )
+    name = models.CharField(
+        max_length=MAX_LENGTH,
+        verbose_name="Название места"
+    )
 
     class Meta:
         verbose_name = "местоположение"
@@ -66,19 +68,6 @@ class Location(BaseModel):
 
 
 class Post(BaseModel):
-    title = models.CharField(max_length=MAX_LENGTH,
-                             verbose_name="Заголовок"
-                             )
-    text = models.TextField(verbose_name="Текст")
-    pub_date = models.DateTimeField(
-        auto_now=False,
-        auto_now_add=False,
-        verbose_name="Дата и время публикации",
-        help_text=(
-            "Если установить дату и время в будущем — можно делать "
-            "отложенные публикации."
-        ),
-    )
     author = models.ForeignKey(
         User,
         verbose_name="Автор публикации",
@@ -96,6 +85,21 @@ class Post(BaseModel):
         verbose_name="Категория",
         on_delete=models.SET_NULL,
         null=True,
+    )
+
+    title = models.CharField(
+        max_length=MAX_LENGTH,
+        verbose_name="Заголовок"
+    )
+    text = models.TextField(verbose_name="Текст")
+    pub_date = models.DateTimeField(
+        auto_now=False,
+        auto_now_add=False,
+        verbose_name="Дата и время публикации",
+        help_text=(
+            "Если установить дату и время в будущем — можно делать "
+            "отложенные публикации."
+        ),
     )
     image = models.ImageField("Изображение", blank=True, upload_to="img/")
 
@@ -125,6 +129,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Пост",
     )
+
     text = models.TextField(
         verbose_name="Текст комментария",
     )
