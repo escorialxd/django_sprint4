@@ -88,13 +88,13 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 class CommentDeleteView(
     CommentMixin, CommentDeleteUpdateMixin, LoginRequiredMixin, DeleteView
 ):
-    template_name = "blog/comment.html"
+    pass
 
 
 class CommentUpdateView(
     CommentMixin, CommentDeleteUpdateMixin, LoginRequiredMixin, UpdateView
 ):
-    template_name = "blog/comment.html"
+    pass
 
 
 class ProfileListView(ListView):
